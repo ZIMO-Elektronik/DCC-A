@@ -6,7 +6,7 @@ Dieses Repository enthält eine Beschreibung aktueller Probleme der folgenden [R
 - [RCN-218 DCC-Protokoll DCC-A - Automatische Anmeldung](https://normen.railcommunity.de/RCN-218.pdf)
 - [TN-218 - DCC-Protokoll Bild- und Icon-Nummern für DCC-A](https://normen.railcommunity.de/TN-218.pdf)
 
-Wir erörtern die Probleme an Hand der aktuellen Norm und einiger Beispiele, vergleichen anschließend wie diese innerhalb des MFX-Protokolls gelöst wurden und machen auf Basis dessen Vorschläge zur Änderung der Norm.
+Wir erörtern die Probleme an Hand der aktuellen Norm und einiger Beispiele, vergleichen anschließend wie diese innerhalb des MFX-Protokolls gelöst wurden und machen auf Basis dessen Vorschläge zur Änderung bzw. Erweiterung der Norm.
 
 <details>
   <summary>Inhaltsverzeichnis</summary>
@@ -18,14 +18,16 @@ Wir erörtern die Probleme an Hand der aktuellen Norm und einiger Beispiele, ver
         <li><a href="#tn-218-nummern-der-fahrzeugbilder-und-funktions-icons">TN-218 Nummern der Fahrzeugbilder und Funktions-Icons</a></li>
       </ul>
     <li><a href="#vergleich-mit-mfx">Vergleich mit MFX</a></li>
-    <li><a href="#änderungsvorschlag-rcn-218">Änderungsvorschlag RCN-218</a></li>
+    <li><a href="#erweiterungsvorschlag-rcn-218">Erweiterungsvorschlag RCN-218</a></li>
       <ul>
         <li><a href="#datenraum-2-shortgui">Datenraum 2 ShortGUI</a></li>
+        <li><a href="#datenraum-4-icon-zuordnung">Datenraum 4 Icon Zuordnung</a></li>
+        <li><a href="#datenraum-7-fahrzeugspezifischer-datenraum">Datenraum 7 Fahrzeugspezifischer Datenraum</a></li>
       </ul>
     <li><a href="#änderungsvorschlag-tn-218">Änderungsvorschlag TN-218</a></li>
       <ul>
         <li><a href="#nummern-der-fahrzeugbilder">Nummern der Fahrzeugbilder</a></li>
-        <li><a href="#nummern-der-funktions-icons">Nummern der Funktions-Icons</a></li>
+        <li><a href="#nummern-der-funktions-icons"><s>Nummern der Funktions-Icons</s></a></li>
       </ul>
   </ol>
 </details>
@@ -41,14 +43,15 @@ Die Eigenschaften die hier erwähnt werden und direkt für den Nutzer sichtbar s
 
 ### RCN-218 Datenraum 2 ShortGUI
 Der Datenraum 2 ShortGUI ist aktuell wie folgt definiert:
-| Byte  | Bedeutung                                                                                                                                                                     |
-| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0-7   | Benutzerdefinierter Name des Decoders, utf8 kodiert. Wenn weniger als 8 Byte verwendet werden, ist der Rest mit 0 aufzufüllen.                                                |
-| 8     | 16 Bit Nummer des Fahrzeugbildes (MSB) entsprechend [TN-218](https://normen.railcommunity.de/TN-218.pdf)                                                                      |
-| 9     | 16 Bit Nummer des Fahrzeugbildes (LSB) entsprechend [TN-218](https://normen.railcommunity.de/TN-218.pdf)                                                                      |
-| 10    | Bits 7...6 Funktionsauskunft F0<br>Bit 5 reserviert<br>Bit 4 Daten unvollständig (z.B. weil noch Daten aus einem SUSI-Modul fehlen)<br>Bits 3...0 vereinfachtes Prinzipsymbol |
-| 13... | Funktionsauskunft F1...Fx je zwei Bit pro Funktion, diese geben Auskunft, ob die Funktion benutzbar ist und ob diese schaltend oder tastend verwendet wird.                   |
+| Byte  | Bedeutung                                                                                                                                                                                           |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0-7   | Benutzerdefinierter Name des Decoders, utf8 kodiert. Wenn weniger als 8 Byte verwendet werden, ist der Rest mit 0 aufzufüllen.                                                                      |
+| 8     | 16 Bit Nummer des Fahrzeugbildes (MSB) entsprechend [TN-218](https://normen.railcommunity.de/TN-218.pdf)                                                                                            |
+| 9     | 16 Bit Nummer des Fahrzeugbildes (LSB) entsprechend [TN-218](https://normen.railcommunity.de/TN-218.pdf)                                                                                            |
+| 10    | Bits 7...6 [Funktionsauskunft](#funktionsauskunft) F0<br>Bit 5 reserviert<br>Bit 4 Daten unvollständig (z.B. weil noch Daten aus einem SUSI-Modul fehlen)<br>Bits 3...0 vereinfachtes Prinzipsymbol |
+| 11... | [Funktionsauskunft](#funktionsauskunft) F1...Fx je zwei Bit pro Funktion, diese geben Auskunft, ob die Funktion benutzbar ist und ob diese schaltend oder tastend verwendet wird.                   |
 
+#### Funktionsauskunft
 Die Funktionsauskunft ist folgendermaßen codiert:
 | Bit 1, Bit 0 | Bedeutung                                                                                                                                 |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
@@ -83,7 +86,7 @@ Wir haben nun bereits an zwei Stellen auf eine fehlende Hierarchie hingewiesen, 
 Bei den Fahrzeugbildern ist aktuell ein fortlaufender 16 Bit Wert in Kombination mit einem 4 Bit Prinzipsymbol vorgesehen. Für manche Fahrzeugtypen gibt es gleich eine ganze Reihe aufeinanderfolgender Nummern (z.B. fünf Einträge für eine `Class 66/77`), für manche Fahrzeugtypen gibt es lediglich einen Eintrag (z.B. `V200`). Das Problem ist, dass es zwischen den Einträgen keinerlei Relation gibt. Hat ein Hersteller also beispielsweise ein Bild einer `Class 66/77`, aber **nicht exakt** jenes in der richtigen Farbe oder vom richtigen Betreiber, dann bleibt als einzige Möglichkeit lediglich das Prinzipsymbol `Diesellok` anzuzeigen.
 
 ### Funktions-Icons
-Bei den Funktions-Icons ist aktuell ein fortlaufender 8-24 Bit Wert vorgesehen. Eine Sortierung wurde per Kommentar bewusst nicht vorgenommen:
+Bei den Funktions-Icons ist aktuell ein fortlaufender 8-16(24?) Bit Wert vorgesehen. Eine Sortierung wurde per Kommentar bewusst nicht vorgenommen:
 > Diese Liste ist bewusst unsortiert, da jede Sortierung nicht von Dauer ist, wenn die Liste erweitert wird.
 
 Eine Rückfallebene wie etwa das Prinzipsymbol wurde hier **überhaupt nicht** vorgesehen. Hat ein Hersteller ein Icon nicht, so kann **gar nichts** mehr angezeigt werden außer ein generisches `F` Symbol.
@@ -113,35 +116,41 @@ Je nachdem ob ein Hersteller nun ein Icon für `Kranarm senken`, nur eines für 
 > [!NOTE]  
 > Dieses Beispiel ist konstruiert und dient nur zur Veranschaulichung.
 
-## Änderungsvorschlag RCN-218
-Um die oben genannten Probleme zu lösen schlagen wir folgende Änderungen an den Datenräumen 2 (ShortGUI) und 4 (Icon Zuordnung) vor.
+## Erweiterungsvorschlag RCN-218
+Beim RailCommunity Meeting am 14.10.2026 wurde festgestellt, dass die Datenräume 2 ShortGUI und 4 Icon Zuordnung von der Tams Elektronik GmbH **bereits genutzt** werden. Eine Ausnahme stellt die Nummer des Fahrzeugbildes dar, die bisher nicht verwendet wird. Wir schlagen daher folgende Erweiterungen an diesen Datenräumen vor die **rückwärtskompatibel** sind.
 
 ### Datenraum 2 ShortGUI
-| Byte  | Bedeutung                                                                                                                      |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------ |
-| 0-7   | Benutzerdefinierter Name des Decoders, utf8 kodiert. Wenn weniger als 8 Byte verwendet werden, ist der Rest mit 0 aufzufüllen. |
-| 8-10  | Bits 23...19 Grundbauarten<br>Bits 18...6 Baureihe<br>Bits 5...0 Lackierung                                                    |
-| 11    | Bits 7...5 reserviert<br>Bit 4 Daten unvollständig (z.B. weil noch Daten aus einem SUSI-Modul fehlen)<br>Bits 3...0 reserviert |
-| 12... | [Steuerungsauskunft](#steuerungsauskunft)                                                                                      |
+| Byte      | Bedeutung                                                                                                                                                                                           |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0-7       | Benutzerdefinierter Name des Decoders, utf8 kodiert. Wenn weniger als 8 Byte verwendet werden, ist der Rest mit 0 aufzufüllen.                                                                      |
+| **8**     | Baureihe (MSB) entsprechend [TN-218](https://normen.railcommunity.de/TN-218.pdf)                                                                                                                    |
+| **9**     | Baureihe (LSB) entsprechend [TN-218](https://normen.railcommunity.de/TN-218.pdf)                                                                                                                    |
+| 10        | Bits 7...6 [Funktionsauskunft](#funktionsauskunft) F0<br>Bit 5 reserviert<br>Bit 4 Daten unvollständig (z.B. weil noch Daten aus einem SUSI-Modul fehlen)<br>Bits 3...0 vereinfachtes Prinzipsymbol |
+| 11...27   | [Funktionsauskunft](#funktionsauskunft) F1...Fx je zwei Bit pro Funktion, diese geben Auskunft, ob die Funktion benutzbar ist und ob diese schaltend oder tastend verwendet wird.                   |
+| **28**    | Lackierung entsprechend [TN-218](https://normen.railcommunity.de/TN-218.pdf)                                                                                                                        |
+| **29...** | [Steuerungsauskunft](#steuerungsauskunft)                                                                                                                                                           |
 
-Die 16 Bit Nummer des Fahrzeugbildes wird auf 24 Bit erhöht. Statt einer fortlaufenden Nummer werden in diesen 24 Bits die
-- Grundbauart (vormals Prinzipsymbol)
-- Baureihe und
-- Lackierung
-des Fahrzeugs codiert. Dies erlaubt es einer Zentrale die korrekte Baureihe anzuzeigen, auch wenn für die exakte Lackierung kein Fahrzeugbild zur Verfügung steht.
+Die Nummer des Fahrzeugbildes wird durch die Baureihe ersetzt. Zusätzlich wird das 28.Byte für die Lackierung vorgesehen. Das komplette Fahrzeugbild ergibt sich somit aus:
+| Wert                | Bedeutung                      |
+| ------------------- | ------------------------------ |
+| 4 Bit Prinzipsymbol | Grundbauarten (Antrieb+Aufbau) |
+| 16 Bit Baureihe     | Baureihen pro Grundbauart      |
+| 8 Bit Lackierung    | Lackierungen pro Baureihe      |
 
-Die 2 Bit Funktionsauskunft pro Funktion werden auf 2-4 Bytes [Steuerungsauskunft](#steuerungsauskunft) erhöht. Dies erlaubt es sowohl Analogfunktionen als auch Binärzustände einzubinden.
+Dies erlaubt es einer Zentrale die korrekte Baureihe anzuzeigen, auch wenn für die exakte Lackierung kein Fahrzeugbild zur Verfügung steht. Als unterste Rückfallebene bleibt wie gehabt das Prinzipsymbol.
+
+Im Anschluss an die Lackierung folgt die sogenannte [Steuerungsauskunft](#steuerungsauskunft). Sie stellt eine Erweiterung der [Funktionsauskunft](#funktionsauskunft) dar, die sowohl **Analogfunktionen** als auch **Binärzustände** darstellen kann. Die Steuerungsauskunft ist **optional** und kann auch in Kombination mit der Funktionsauskunft verwendet werden. So bietet es sich an einfache Funktionen in der Funktionsauskunft abzulegen, wohingegen komplexere Funktionen (z.b. mit Zeit Parameter) in der Steuerungsauskunft gespeichert werden.
 
 #### Steuerungsauskunft
 Jede Steuerungsauskunft besteht aus 2-4 Bytes und ist folgendermaßen codiert:
-| Byte | Bedeutung | bei Funktionsnummer                       | bei Analogfunktion | bei Binärzustand                          |
+| Byte | Bedeutung | für Funktionsnummer                       | für Analogfunktion | für Binärzustand                          |
 | ---- | --------- | ----------------------------------------- | ------------------ | ----------------------------------------- |
-| n    |           | 0-68 Funktionsnummer                      | ==254              | ==255                                     |
-| n+1  |           | [Funktionsverhalten](#funktionsverhalten) | Analogkanal        | Binärzustandsadresse LSB                  |
-| n+2  |           |                                           | Minimalwert        | Binärzustandsadresse MSB                  |
-| n+3  |           |                                           | Maximalwert        | [Funktionsverhalten](#funktionsverhalten) |
+| 0    |           | 0-68 Funktionsnummer                      | ==100              | ==101                                     |
+| 1    |           | [Funktionsverhalten](#funktionsverhalten) | Analogkanal        | Binärzustandsadresse LSB                  |
+| 2    |           |                                           | Minimalwert        | Binärzustandsadresse MSB                  |
+| 3    |           |                                           | Maximalwert        | [Funktionsverhalten](#funktionsverhalten) |
 
-Funktionen und Binärzustände geben ihr [Funktionsverhalten](#funktionsverhalten) bekannt, wohingegen Analogfunktionen einen Minimal- und Maximalwert enthalten.
+Funktionen und Binärzustände geben ihr [Funktionsverhalten](#funktionsverhalten) bekannt. Im Gegensatz zur Funktionsauskunft bietet das Funktionsverhalten mehr Möglichkeiten sowie einen optional Parameter. Analogfunktionen erhalten einen Minimal- und Maximalwert um entsprechende Grenzwerte für einen Schieberegler anzeigen zu können.
 
 #### Funktionsverhalten
 Das Funktionsverhalten ist folgendermaßen codiert DDDD-VVVV:
@@ -176,76 +185,39 @@ Das Funktionsverhalten ist folgendermaßen codiert DDDD-VVVV:
 | 15   |           | 600s                                              |
 
 ### Datenraum 4 Icon Zuordnung
-| Maximale Anzahl Bytes | Bedeutung                                 |
-| --------------------- | ----------------------------------------- |
-| 3                     | [Steuerungsnummer](#steuerungsnummer)     |
-| 3                     | Kategorie + [Grundsymbol + [Modifikator]] |
-| 3                     | [Steuerungsnummer](#steuerungsnummer)     |
-| 3                     | ...                                       |
+| Maximale Anzahl Bytes | Bedeutung                                                                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **3**                 | [Funktionsnummer](#funktionsnummer)                                                                                          |
+| 2                     | Nummer des zuzuordnenden Icons<br>Die Tabelle der Icon-Nummern steht in [TN-218](https://normen.railcommunity.de/TN-218.pdf) |
+| **3**                 | [Funktionsnummer](#funktionsnummer)                                                                                          |
+| 2                     | ...                                                                                                                          |
 
-Das 1 Byte Funktionsnummer wird auf 3 Byte [Steuerungsnummer](#steuerungsnummer) erhöht. Dies erlaubt es sowohl für Analogfunktionen als auch für Binärzustände ein Icon zuzuordnen.
-Auf die Steuerungsnummer folgen bis zu 3 Bytes Icon Daten. Für die Codierung sei an dieser Stelle auf das Kapitel [Nummern der Funktions-Icons](#nummern-der-funktions-icons) verwiesen.
+Um Analogfunktionen und Binärzuständen auch Icons zuordnen zu können wird das Byte Funktionsnummer auf 1-3 Byte erweitert. Zusätzliche Spezialwert (z.B. 200) erlauben es Icons für Dinge abseits von Funktionen, Analogfunktionen und Binärzuständen zu hinterlegen.
 
-#### Steuerungsnummer
-Jede Steuerungsnummer besteht aus 1-3 Bytes und ist folgendermaßen codiert:
-| Byte | Bedeutung | bei Funktionsnummer  | bei Analogfunktion | bei Binärzustand         |
-| ---- | --------- | -------------------- | ------------------ | ------------------------ |
-| n    |           | 0-68 Funktionsnummer | ==254              | ==255                    |
-| n+1  |           |                      | Analogkanal        | Binärzustandsadresse LSB |
-| n+2  |           |                      |                    | Binärzustandsadresse MSB |
+#### Funktionsnummer
+Jede Funktionsnummer besteht aus 1-3 Bytes und ist folgendermaßen codiert:
+| Byte | Bedeutung | für Funktionsnummer  | für Analogfunktion | für Binärzustand         | für Tacho |
+| ---- | --------- | -------------------- | ------------------ | ------------------------ | --------- |
+| 0    |           | 0-68 Funktionsnummer | ==100              | ==101                    | ==200     |
+| 1    |           |                      | Analogkanal        | Binärzustandsadresse LSB |           |
+| 2    |           |                      |                    | Binärzustandsadresse MSB |           |
 
 > [!NOTE]  
-> Die Codierung der [Steuerungsnummer](#steuerungsnummer) ist ident mit den ersten Bytes der [Steuerungsauskunft](#steuerungsauskunft).
+> Die Codierung der [Funktionsnummer](#funktionsnummer) ist für Funktionen, Analogfunktionen und Binärzustände ident mit den ersten Bytes der [Steuerungsauskunft](#steuerungsauskunft).
+
+#### Datenraum 7 Fahrzeugspezifischer Datenraum
+| Maximale Anzahl Bytes | Bedeutung                                   |
+| --------------------- | ------------------------------------------- |
+| 16                    | Herstellername des Fahrzeugs                |
+| 16                    | Alphanumerische Produktnummer des Fahrzeugs |
+| 92                    | URL für ein Fahrzeugbild                    |
+| **8**                 | Höchstgeschwindigkeit inkl. Einheit         |
+
+Der Datenraum 7 vermisst noch etliche Meta Daten zum Fahrzeug. Wir vermissen in erster Linie die Höchstgeschwindigkeit. Um die NMRA miteinzubeziehen könnte man in Erwägung ziehen die Einheit mit anzugeben.
 
 ## Änderungsvorschlag TN-218
 ### Nummern der Fahrzeugbilder
-TODO
+:construction: Wir bitten um Verständnis dass wir diesbezüglich erst Vorschläge machen können wenn es bei der RCN-218 zu einer Einigung kam.
 
-### Nummern der Funktions-Icons
-TODO
-
-Dynamische Länge bei Icons?
-Letztes Byte bei Icons Modifikator in 4x2er Nibble
-XX XX XX XX
-
-### TODO
-Epoche?
-Antriebsart?
-Tacho-Daten?
-
-## Kategorien
-Außenbeleuchtung
-Innenbeleuchtung
-  Spitzen- und Schlusslicht
-  Fern- und Abblendlicht
-  Signal- und Warnlicht
-  Sonderbeleuchtung(?)
-  Anzeige-und Kennzeichnungslicht
-  Fahrzeugbeleuchtung (allgemein)
-
-Pantograph
-
-Türe
-
-Funktion(?)
-Piktogramm(?)
-
-Horn
-
-Pfiff
-
-Ansage
-
-Straßenfahrzeug
-
-Kran
-
-Bremse
-
-Schaltwerk
-
-Rangieren
-
-Kupplung
-
-allgemein Geräuscht? Wohin z.B. mit Pufferstoß?
+### ~~Nummern der Funktions-Icons~~
+Die Codierung der Funktions-Icons wird bereits genutzt und kann somit nicht mehr geändert werden.
