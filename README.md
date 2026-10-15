@@ -117,7 +117,7 @@ Je nachdem ob ein Hersteller nun ein Icon für `Kranarm senken`, nur eines für 
 > Dieses Beispiel ist konstruiert und dient nur zur Veranschaulichung.
 
 ## Erweiterungsvorschlag RCN-218
-Beim RailCommunity Meeting am 14.10.2026 wurde festgestellt, dass die Datenräume 2 ShortGUI und 4 Icon Zuordnung von der Tams Elektronik GmbH **bereits genutzt** werden. Eine Ausnahme stellt die Nummer des Fahrzeugbildes dar, die bisher nicht verwendet wird. Wir schlagen daher folgende Erweiterungen an diesen Datenräumen vor die **rückwärtskompatibel** sind.
+Beim RailCommunity Meeting am 14.10.2026 wurde festgestellt, dass die Datenräume 2 ShortGUI und 4 Icon Zuordnung von der [Tams Elektronik GmbH](https://tams-online.de/) **bereits genutzt** werden. Eine Ausnahme stellt die Nummer des Fahrzeugbildes dar, die bisher nicht verwendet wird. Wir schlagen daher folgende Erweiterungen an diesen Datenräumen vor die **rückwärtskompatibel** sind.
 
 ### Datenraum 2 ShortGUI
 | Byte      | Bedeutung                                                                                                                                                                                           |
@@ -142,15 +142,27 @@ Dies erlaubt es einer Zentrale die korrekte Baureihe anzuzeigen, auch wenn für 
 Im Anschluss an die Lackierung folgt die sogenannte [Steuerungsauskunft](#steuerungsauskunft). Sie stellt eine Erweiterung der [Funktionsauskunft](#funktionsauskunft) dar, die sowohl **Analogfunktionen** als auch **Binärzustände** darstellen kann. Die Steuerungsauskunft ist **optional** und kann auch in Kombination mit der Funktionsauskunft verwendet werden. So bietet es sich an einfache Funktionen in der Funktionsauskunft abzulegen, wohingegen komplexere Funktionen (z.b. mit Zeit Parameter) in der Steuerungsauskunft gespeichert werden.
 
 #### Steuerungsauskunft
-Jede Steuerungsauskunft besteht aus 2-4 Bytes und ist folgendermaßen codiert:
-| Byte | Bedeutung | für Funktionsnummer                       | für Analogfunktion | für Binärzustand                          |
-| ---- | --------- | ----------------------------------------- | ------------------ | ----------------------------------------- |
-| 0    |           | 0-68 Funktionsnummer                      | ==100              | ==101                                     |
-| 1    |           | [Funktionsverhalten](#funktionsverhalten) | Analogkanal        | Binärzustandsadresse LSB                  |
-| 2    |           |                                           | Minimalwert        | Binärzustandsadresse MSB                  |
-| 3    |           |                                           | Maximalwert        | [Funktionsverhalten](#funktionsverhalten) |
+Jede Steuerungsauskunft besteht aus 2 oder mehr Bytes und ist folgendermaßen codiert:
+| Byte | Bedeutung   | für Funktionsnummer                       | für Analogfunktion | für Binärzustand                          |
+| ---- | ----------- | ----------------------------------------- | ------------------ | ----------------------------------------- |
+| 0    | Typ & Länge | 0-68 Funktionsnummer                      | ==128              | ==129                                     |
+| 1    |             | [Funktionsverhalten](#funktionsverhalten) | Analogkanal        | Binärzustandsadresse LSB                  |
+| 2    |             |                                           | Minimalwert        | Binärzustandsadresse MSB                  |
+| 3    |             |                                           | Maximalwert        | [Funktionsverhalten](#funktionsverhalten) |
 
 Funktionen und Binärzustände geben ihr [Funktionsverhalten](#funktionsverhalten) bekannt. Im Gegensatz zur Funktionsauskunft bietet das Funktionsverhalten mehr Möglichkeiten sowie einen optional Parameter. Analogfunktionen erhalten einen Minimal- und Maximalwert um entsprechende Grenzwerte für einen Schieberegler anzeigen zu können.
+
+> [!IMPORTANT]  
+> Das 1.Byte der Steuerungsauskunft codiert zugleich ihre eigene Gesamtlänge. Dies erlaubt es Zentralen auch mit neuen, unbekannten Werten kompatibel zu bleiben.
+> Die Einteilung ist folgendermaßen codiert:
+> | Bereich | Gesamtlänge der Steuerungsauskunft |
+> | ------- | ---------------------------------- |
+> | 0-95    | 2 Bytes                            |
+> | 96-127  | 3 Bytes                            |
+> | 128-159 | 4 Bytes                            |
+> | 160-191 | 5 Bytes                            |
+> | 192-223 | 6 Bytes                            |
+> | 224-255 | 7 Bytes                            |
 
 #### Funktionsverhalten
 Das Funktionsverhalten ist folgendermaßen codiert DDDD-VVVV:
@@ -187,23 +199,32 @@ Das Funktionsverhalten ist folgendermaßen codiert DDDD-VVVV:
 ### Datenraum 4 Icon Zuordnung
 | Maximale Anzahl Bytes | Bedeutung                                                                                                                    |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **3**                 | [Funktionsnummer](#funktionsnummer)                                                                                          |
+| **6**                 | [Funktionsnummer](#funktionsnummer)                                                                                          |
 | 2                     | Nummer des zuzuordnenden Icons<br>Die Tabelle der Icon-Nummern steht in [TN-218](https://normen.railcommunity.de/TN-218.pdf) |
-| **3**                 | [Funktionsnummer](#funktionsnummer)                                                                                          |
+| **6**                 | [Funktionsnummer](#funktionsnummer)                                                                                          |
 | 2                     | ...                                                                                                                          |
 
-Um Analogfunktionen und Binärzuständen auch Icons zuordnen zu können wird das Byte Funktionsnummer auf 1-3 Byte erweitert. Zusätzliche Spezialwert (z.B. 200) erlauben es Icons für Dinge abseits von Funktionen, Analogfunktionen und Binärzuständen zu hinterlegen.
+Um Analogfunktionen und Binärzuständen auch Icons zuordnen zu können wird das Byte Funktionsnummer erweitert. Zusätzliche Spezialwert erlauben es Icons für Dinge abseits von Funktionen, Analogfunktionen und Binärzuständen zu hinterlegen.
 
 #### Funktionsnummer
-Jede Funktionsnummer besteht aus 1-3 Bytes und ist folgendermaßen codiert:
-| Byte | Bedeutung | für Funktionsnummer  | für Analogfunktion | für Binärzustand         | für Tacho |
-| ---- | --------- | -------------------- | ------------------ | ------------------------ | --------- |
-| 0    |           | 0-68 Funktionsnummer | ==100              | ==101                    | ==200     |
-| 1    |           |                      | Analogkanal        | Binärzustandsadresse LSB |           |
-| 2    |           |                      |                    | Binärzustandsadresse MSB |           |
+Jede Funktionsnummer besteht aus 1 oder mehr Bytes und ist folgendermaßen codiert:
+| Byte | Bedeutung   | für Funktionsnummer  | für Tacho | für Analogfunktion | für Binärzustand         |
+| ---- | ----------- | -------------------- | --------- | ------------------ | ------------------------ |
+| 0    | Typ & Länge | 0-68 Funktionsnummer | ==95      | ==96               | ==128                    |
+| 1    |             |                      |           | Analogkanal        | Binärzustandsadresse LSB |
+| 2    |             |                      |           |                    | Binärzustandsadresse MSB |
 
-> [!NOTE]  
-> Die Codierung der [Funktionsnummer](#funktionsnummer) ist für Funktionen, Analogfunktionen und Binärzustände ident mit den ersten Bytes der [Steuerungsauskunft](#steuerungsauskunft).
+> [!IMPORTANT]  
+> Das 1.Byte der Funktionsnummer codiert zugleich ihre eigene Gesamtlänge. Dies erlaubt es Zentralen auch mit neuen, unbekannten Werten kompatibel zu bleiben.
+> Die Einteilung ist folgendermaßen codiert:
+> | Bereich | Gesamtlänge der Funktionsnummer |
+> | ------- | ------------------------------- |
+> | 0-95    | 1 Byte                          |
+> | 96-127  | 2 Bytes                         |
+> | 128-159 | 3 Bytes                         |
+> | 160-191 | 4 Bytes                         |
+> | 192-223 | 5 Bytes                         |
+> | 224-255 | 6 Bytes                         |
 
 #### Datenraum 7 Fahrzeugspezifischer Datenraum
 | Maximale Anzahl Bytes | Bedeutung                                   |
