@@ -21,6 +21,7 @@ Wir erörtern die Probleme an Hand der aktuellen Norm und einiger Beispiele, ver
     <li><a href="#erweiterungsvorschlag-rcn-218">Erweiterungsvorschlag RCN-218</a></li>
       <ul>
         <li><a href="#datenraum-2-shortgui">Datenraum 2 ShortGUI</a></li>
+        <li><a href="#datenraum-3-cv-read">Datenraum 3 CV-Read</a></li>
         <li><a href="#datenraum-4-icon-zuordnung">Datenraum 4 Icon Zuordnung</a></li>
         <li><a href="#datenraum-7-fahrzeugspezifischer-datenraum">Datenraum 7 Fahrzeugspezifischer Datenraum</a></li>
       </ul>
@@ -195,6 +196,13 @@ Das Funktionsverhalten ist folgendermaßen codiert DDDD-VVVV:
 | 13   |           | 256s                                              |
 | 14   |           | 392s                                              |
 | 15   |           | 600s                                              |
+
+### Datenraum 3 CV-Read
+Der spezielle Datenraum 3 dient zum Auslesen von CVs. Das Auslesen erfolgt über eine eigene Variante des `SELECT` Befehls. Dieser ist aktuell wie folgt codiert:
+```sh
+1101-HHHH HHHH-HHHH UUUU-UUUU UUUU-UUUU UUUU-UUUU UUUU-UUUU BBBB-BBBB (NNNN-NNNN VVVV-VVVV VVVV-VVVV vvvv-vvvv aaaa-aaaa)
+```
+Wobei `aaaa-aaaa` die Anzahl der angefragten CVs darstellt. Da der Wert 0 keine sinnvolle Anwendung hat schlagen wir vor einen Offset von 1 hinzuzufügen. Damit entspräche der Wert 0 dann 1 CV, der Wert 1 entspräche 2 CVs, usw.
 
 ### Datenraum 4 Icon Zuordnung
 | Maximale Anzahl Bytes | Bedeutung                                                                                                                    |
